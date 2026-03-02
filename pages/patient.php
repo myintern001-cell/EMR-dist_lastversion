@@ -26,6 +26,21 @@ include '../components/head.php';
       <div class="hn-search-sub">กรอกหมายเลข HN แล้วกด Enter หรือคลิกปุ่มค้นหา</div>
       <div class="hn-input-row">
         <input type="text" id="hnInput" class="hn-input" placeholder="กรอก HN เช่น 123456" maxlength="20" autocomplete="off">
+
+        <!-- Date filter toggle -->
+        <div class="date-filter-wrap">
+          <label class="date-filter-toggle" id="dateFilterToggleLabel" title="กรองตามวันที่อัปโหลด">
+            <input type="checkbox" id="dateFilterToggle">
+            <span class="date-toggle-icon"><i class="bi bi-calendar3"></i></span>
+            <span class="date-toggle-txt">ระบุวันที่</span>
+          </label>
+          <div class="date-filter-picker" id="dateFilterPicker" style="display:none">
+            <input type="date" id="dateFrom" class="date-input" title="วันที่เริ่มต้น">
+            <span class="date-sep">—</span>
+            <input type="date" id="dateTo" class="date-input" title="วันที่สิ้นสุด">
+          </div>
+        </div>
+
         <button class="btn btn-primary" id="btnSearch">
           <i class="bi bi-search"></i> ค้นหา
         </button>
@@ -47,24 +62,27 @@ include '../components/head.php';
       </div>
     </div>
 
-    <!-- Document Type Section (hidden until patient found) -->
+    <!-- Document Section (hidden until patient found) -->
     <div id="doctypeSection" style="display:none">
-      <div class="doctype-section">
-        <div class="doctype-section-title">
-          <i class="bi bi-grid-3x3-gap-fill" style="color:var(--primary)"></i>
-          เลือกหมวดเอกสาร
-          <span style="font-size:13px;font-weight:500;color:var(--text-muted)" id="doctypeSubtitle"></span>
-        </div>
-        <div class="doctype-grid" id="doctypeGrid">
-          <!-- Skeleton loading -->
-          <div style="height:76px" class="skeleton"></div>
-          <div style="height:76px" class="skeleton"></div>
-          <div style="height:76px" class="skeleton"></div>
-          <div style="height:76px" class="skeleton"></div>
+
+      <!-- Document Cards for selected category -->
+      <div id="docCardsSection">
+        <div class="doctype-section">
+          <div class="doctype-section-title" id="docCardsSectionTitle">
+            <i class="bi bi-grid-3x3-gap-fill" style="color:var(--primary)"></i>
+            <span id="docCardsCategoryName">เลือกหมวดเอกสารจากแถบด้านซ้าย</span>
+            <span style="font-size:13px;font-weight:500;color:var(--text-muted)" id="docCardsSubtitle"></span>
+          </div>
+          <div class="doc-cards-grid" id="docCardsGrid">
+            <div class="doc-cards-placeholder">
+              <i class="bi bi-arrow-left-circle" style="font-size:36px;display:block;margin-bottom:12px;color:var(--border-strong)"></i>
+              เลือกหมวดเอกสารจากแถบด้านซ้าย
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Inline PDF Viewer (hidden until doctype selected) -->
+      <!-- Inline PDF Viewer (hidden until doc selected) -->
       <div id="pdfViewerWrap" style="display:none">
         <div class="doc-list-section">
 
@@ -79,7 +97,7 @@ include '../components/head.php';
                 <i class="bi bi-download"></i> ดาวน์โหลด
               </button>
               <button class="btn btn-ghost" id="btnBackDoctype" style="font-size:13px;padding:8px 14px">
-                <i class="bi bi-arrow-left"></i> เปลี่ยนหมวด
+                <i class="bi bi-arrow-left"></i> กลับรายการ
               </button>
             </div>
           </div>
