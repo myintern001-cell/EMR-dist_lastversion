@@ -1,15 +1,12 @@
 <?php
-$pageTitle  = 'อัปโหลดเอกสาร';
-$breadcrumb = 'อัปโหลดเอกสาร';
-$activePage = 'upload';
-include '../components/head.php';
+require BASE_PATH . '/views/layouts/head.php';
 ?>
-  <link rel="stylesheet" href="../components/styles.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/styles.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
 </head>
 <body>
-<?php include '../components/sidebar.php'; ?>
-<?php include '../components/topbar.php'; ?>
+<?php require BASE_PATH . '/views/layouts/sidebar.php'; ?>
+<?php require BASE_PATH . '/views/layouts/topbar.php'; ?>
 
 <div class="main-content">
   <div class="content-area">
@@ -124,7 +121,8 @@ include '../components/head.php';
   </div>
 </div>
 
+<script>const BASE_URL = '<?= BASE_URL ?>';</script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="../js/upload_page.js" type="module"></script>
-<?php include '../components/footer.php'; ?>
+<script src="<?= BASE_URL ?>/public/js/upload_page.js" type="module"></script>
+<?php require BASE_PATH . '/views/layouts/footer.php'; ?>

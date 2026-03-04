@@ -1,11 +1,11 @@
 <?php
-// components/sidebar.php
+// views/layouts/sidebar.php
 // ใช้งาน: กำหนด $activePage = 'documents' | 'upload' | 'patient' ก่อน include
 $activePage = $activePage ?? '';
 $menus = [
-    ['id' => 'patient',   'href' => 'patient.php',   'icon' => 'bi-person-lines-fill', 'label' => 'ค้นหาผู้ป่วย'],
-    ['id' => 'documents', 'href' => 'documents.php', 'icon' => 'bi-folder2-open',      'label' => 'เอกสารทั้งหมด'],
-    ['id' => 'upload',    'href' => 'upload.php',    'icon' => 'bi-floppy-fill',       'label' => 'อัปโหลดเอกสาร'],
+    ['id' => 'patient',   'href' => BASE_URL . '/patient',   'icon' => 'bi-person-lines-fill', 'label' => 'ค้นหาผู้ป่วย'],
+    ['id' => 'documents', 'href' => BASE_URL . '/documents', 'icon' => 'bi-folder2-open',      'label' => 'เอกสารทั้งหมด'],
+    ['id' => 'upload',    'href' => BASE_URL . '/upload',    'icon' => 'bi-floppy-fill',       'label' => 'อัปโหลดเอกสาร'],
 ];
 ?>
 <div class="sidebar">

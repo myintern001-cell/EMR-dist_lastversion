@@ -1,5 +1,5 @@
 <?php
-// components/topbar.php
+// views/layouts/topbar.php
 $breadcrumb = $breadcrumb ?? 'หน้าหลัก';
 ?>
 <div class="topbar">

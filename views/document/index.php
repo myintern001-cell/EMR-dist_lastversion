@@ -1,14 +1,11 @@
 <?php
-$pageTitle  = 'เอกสารทั้งหมด';
-$breadcrumb = 'เอกสารทั้งหมด';
-$activePage = 'documents';
-include '../components/head.php';
+require BASE_PATH . '/views/layouts/head.php';
 ?>
-  <link rel="stylesheet" href="../components/styles.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/styles.css">
 </head>
 <body>
-<?php include '../components/sidebar.php'; ?>
-<?php include '../components/topbar.php'; ?>
+<?php require BASE_PATH . '/views/layouts/sidebar.php'; ?>
+<?php require BASE_PATH . '/views/layouts/topbar.php'; ?>
 
 <div class="main-content">
   <div class="content-area">
@@ -21,7 +18,7 @@ include '../components/head.php';
       </div>
       <div class="header-actions">
         <button class="btn btn-ghost" onclick="loadDocs()"><i class="bi bi-arrow-clockwise"></i> รีเฟรช</button>
-        <a href="upload.php" class="btn btn-primary"><i class="bi bi-plus-lg"></i> อัปโหลดเอกสาร</a>
+        <a href="<?= BASE_URL ?>/upload" class="btn btn-primary"><i class="bi bi-plus-lg"></i> อัปโหลดเอกสาร</a>
       </div>
     </div>
 
@@ -120,5 +117,6 @@ include '../components/head.php';
   <div class="dp-body" id="dpBody"></div>
 </div>
 
-<script src="../js/document_page.js"></script>
-<?php include '../components/footer.php'; ?>
+<script>const BASE_URL = '<?= BASE_URL ?>';</script>
+<script src="<?= BASE_URL ?>/public/js/document_page.js"></script>
+<?php require BASE_PATH . '/views/layouts/footer.php'; ?>

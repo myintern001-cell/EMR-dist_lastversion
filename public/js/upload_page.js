@@ -37,7 +37,7 @@ const doctypeSelect = document.getElementById('doctypeUploadInput');
       searching: () => 'กำลังค้นหา...',
     },
   });
-  fetch('../services/doctype_list.php')
+  fetch(BASE_URL + '/api/doctypes')
     .then(r => r.json())
     .then(data => {
       const sel = document.getElementById('doctypeUploadInput');
@@ -160,7 +160,7 @@ async function doUpload() {
   form.append('hn', hn);
   form.append('doctype_id', doctype_id);
   try {
-    const res  = await fetch('../services/upload_doc.php', { method:'POST', body:form });
+    const res  = await fetch(BASE_URL + '/api/upload', { method:'POST', body:form });
     const text = await res.text();
     let data;
     try {

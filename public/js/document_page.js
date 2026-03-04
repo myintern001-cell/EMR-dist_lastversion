@@ -34,7 +34,7 @@ async function loadDocs() {
       กำลังโหลด...
     </td></tr>`;
   try {
-    const res  = await fetch('../services/documents_api.php');
+    const res  = await fetch(BASE_URL + '/api/documents');
     const json = await res.json();
     if (json.error) throw new Error(json.error);
     allDocs = json.data || [];
@@ -200,7 +200,7 @@ function closePanel() {
 // ── DOWNLOAD & DELETE ─────────────────────────────────
 function doDownload(doc) {
   const a = document.createElement('a');
-  a.href = `../services/download.php?id=${encodeURIComponent(doc.id)}`;
+  a.href = BASE_URL + `/api/download?id=${encodeURIComponent(doc.id)}`;
   a.download = doc.original_name;
   a.click();
 }
@@ -215,7 +215,7 @@ async function doDelete(id) {
   });
   if (!result.isConfirmed) return;
   try {
-    const res  = await fetch('../services/delete_doc.php', {
+    const res  = await fetch(BASE_URL + '/api/documents/delete', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ id }),

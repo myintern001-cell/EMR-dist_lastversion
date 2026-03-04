@@ -94,7 +94,7 @@ async function searchPatient() {
   btnSearch.disabled = true;
   btnSearch.innerHTML = '<div class="toast-spinner" style="border-color:#fff3;border-top-color:#fff;margin:0"></div>';
   try {
-    const res  = await fetch(`../services/patient_api.php?hn=${encodeURIComponent(hn)}`);
+    const res  = await fetch(BASE_URL + `/api/patient?hn=${encodeURIComponent(hn)}`);
     const data = await res.json();
     if (data.error || !data.patient) {
       Swal.fire({ icon:'warning', title:'ไม่พบผู้ป่วย', text:`ไม่พบ HN: ${hn}`, confirmButtonColor:'#1dd1bd' });
@@ -129,7 +129,7 @@ async function loadSidebarCategories(hn) {
   sidebarCatMenu.innerHTML = `
     <li><a class="sidebar-cat-loading"><div class="sidebar-spinner"></div> กำลังโหลด...</a></li>`;
   try {
-    const url  = `../services/patient_doctypes.php?hn=${encodeURIComponent(hn)}${getDateParams()}`;
+    const url  = BASE_URL + `/api/patient/doctypes?hn=${encodeURIComponent(hn)}${getDateParams()}`;
     const res  = await fetch(url);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
@@ -183,7 +183,7 @@ async function loadDocCards(doctype) {
     <div style="height:88px" class="skeleton"></div>
     <div style="height:88px" class="skeleton"></div>`;
   try {
-    const url  = `../services/patient_docs.php?hn=${encodeURIComponent(currentHN)}&doctype_id=${encodeURIComponent(doctype.doctype_id)}${getDateParams()}`;
+    const url  = BASE_URL + `/api/patient/docs?hn=${encodeURIComponent(currentHN)}&doctype_id=${encodeURIComponent(doctype.doctype_id)}${getDateParams()}`;
     const res  = await fetch(url);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
@@ -260,13 +260,13 @@ async function openDocPdf(doc, cardEl, doctype) {
     btnDownloadPdf.style.display = '';
     btnDownloadPdf.onclick = () => {
       const a = document.createElement('a');
-      a.href = `../services/download.php?id=${encodeURIComponent(doc.id)}`;
+      a.href = BASE_URL + `/api/download?id=${encodeURIComponent(doc.id)}`;
       a.download = doc.original_name;
       a.click();
     };
 
     // Load PDF
-    await viewer.load(`../services/download.php?id=${encodeURIComponent(doc.id)}&inline=1`);
+    await viewer.load(BASE_URL + `/api/download?id=${encodeURIComponent(doc.id)}&inline=1`);
 
   } catch(e) {
     viewerBody.innerHTML = `
