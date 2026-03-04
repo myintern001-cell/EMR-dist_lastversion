@@ -30,10 +30,12 @@ $menus = [
     <?php endforeach; ?>
   </ul>
 <?php if ($activePage === 'patient'): ?>
-  <div class="sidebar-section sidebar-cat-section" id="sidebarCatSection" style="display:none">
-    หมวดเอกสาร
+  <div class="sidebar-categories-wrapper">
+    <div class="sidebar-section sidebar-cat-section" id="sidebarCatSection" style="display:none">
+      หมวดเอกสาร
+    </div>
+    <ul class="sidebar-menu" id="sidebarCatMenu">
+    </ul>
   </div>
-  <ul class="sidebar-menu" id="sidebarCatMenu">
-  </ul>
 <?php endif; ?>
 </div>

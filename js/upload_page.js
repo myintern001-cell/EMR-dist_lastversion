@@ -160,7 +160,7 @@ async function doUpload() {
   form.append('hn', hn);
   form.append('doctype_id', doctype_id);
   try {
-    const res  = await fetch('../services/upload.php', { method:'POST', body:form });
+    const res  = await fetch('../services/upload_doc.php', { method:'POST', body:form });
     const text = await res.text();
     let data;
     try {

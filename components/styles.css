@@ -110,7 +110,7 @@ body {
 }
 
 .sidebar-menu:first-of-type {
-    flex: 1;
+    flex: 0 1 auto;
 }
 
 .sidebar-menu li {
@@ -1849,6 +1849,34 @@ height: 20px;
 @keyframes shimmer {
 0%   { background-position: 200% 0; }
 100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR CATEGORIES WRAPPER
+═══════════════════════════════════════ */
+.sidebar-categories-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 420px);
+    margin-top: 0;
+}
+
+.sidebar-categories-wrapper::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-categories-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-categories-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+}
+
+.sidebar-categories-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.3);
 }
 
 /* ═══════════════════════════════════════
