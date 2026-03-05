@@ -17,6 +17,7 @@ $router = new Router();
 // --- Page Routes ---
 $router->get('/',          'PatientController',  'index');
 $router->get('/patient',   'PatientController',  'index');
+$router->get('/patient/{hn}', 'PatientController',  'index');
 $router->get('/documents', 'DocumentController', 'index');
 $router->get('/upload',    'UploadController',   'index');
 

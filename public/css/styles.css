@@ -1282,6 +1282,20 @@ body {
     scrollbar-color: rgba(255,255,255,.12) transparent;
 }
 
+.viewer-sidebar.sidebar-files-mode {
+    width: 280px;
+    padding: 10px 9px;
+}
+
+.viewer-pages-panel {
+    display: block;
+}
+
+.viewer-files-panel {
+    display: none;
+    min-height: 100%;
+}
+
 .viewer-sidebar::-webkit-scrollbar {
     width: 4px;
 }
@@ -1329,6 +1343,119 @@ body {
 
 .thumb-item.active .thumb-num {
     color: var(--primary);
+}
+
+.thumb-file-num {
+    font-size: 9px;
+    color: rgba(255,255,255,.28);
+    font-family: 'IBM Plex Mono', monospace;
+    margin-top: -1px;
+}
+
+.viewer-file-item {
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 9px;
+    padding: 10px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+    transition: all .16s;
+}
+
+.viewer-file-item:hover {
+    background: rgba(255,255,255,.06);
+    border-color: rgba(255,255,255,.16);
+}
+
+.viewer-file-item.active {
+    border-color: rgba(29,209,189,.55);
+    background: rgba(29,209,189,.12);
+}
+
+.viewer-file-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.viewer-file-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,.92);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.viewer-file-meta {
+    margin-top: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.viewer-file-pages {
+    font-size: 10px;
+    color: rgba(255,255,255,.44);
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.viewer-file-status {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.viewer-file-status.status-idle {
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.55);
+}
+
+.viewer-file-status.status-loading {
+    background: rgba(245,166,35,.18);
+    color: #f5a623;
+}
+
+.viewer-file-status.status-ready {
+    background: rgba(29,209,189,.2);
+    color: var(--primary);
+}
+
+.viewer-file-status.status-error {
+    background: rgba(224,92,92,.2);
+    color: #ff8f8f;
+}
+
+.viewer-file-actions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.viewer-file-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.04);
+    color: rgba(255,255,255,.76);
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+}
+
+.viewer-file-btn:hover {
+    border-color: rgba(29,209,189,.5);
+    color: var(--primary);
+    background: rgba(29,209,189,.14);
 }
 
 .viewer-canvas-area {
@@ -1421,6 +1548,36 @@ body {
 .viewer-loading p {
     font-size: 14px;
     color: rgba(255,255,255,.4);
+}
+
+.patient-vt-mode-group {
+    gap: 6px;
+}
+
+.vt-mode-btn {
+    height: 32px;
+    border-radius: 7px;
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.05);
+    color: rgba(255,255,255,.66);
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .2px;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.vt-mode-btn:hover {
+    background: rgba(255,255,255,.12);
+    color: #fff;
+}
+
+.vt-mode-btn.active {
+    background: rgba(29,209,189,.2);
+    border-color: rgba(29,209,189,.5);
+    color: var(--primary);
 }
 
 /* ═══════════════════════════════════════
@@ -1651,6 +1808,19 @@ body {
     justify-content: space-between;
 }
 
+.doc-list-header-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.doc-list-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-left: 14px;
+    flex-shrink: 0;
+}
+
 .doc-list-title {
     font-size: 15px;
     font-weight: 800;
@@ -1660,6 +1830,61 @@ body {
     font-size: 12px;
     color: var(--text-muted);
     margin-top: 2px;
+}
+
+.patient-viewer-progress {
+    margin-top: 8px;
+    width: min(520px, 100%);
+}
+
+.patient-progress-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: #e7edf5;
+    overflow: hidden;
+}
+
+.patient-progress-fill {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #59e4d4);
+    transition: width .22s ease;
+}
+
+.patient-progress-texts {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+@media (max-width: 980px) {
+    .doc-list-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .doc-list-header-actions {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .patient-viewer-progress {
+        width: 100%;
+    }
+
+    .viewer-sidebar.sidebar-files-mode {
+        width: 240px;
+    }
 }
 
 /* ═══════════════════════════════════════

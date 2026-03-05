@@ -4,7 +4,17 @@ import { esc, fmtSize, PdfViewer } from './pdf_viewer.js';
 
 let currentHN          = '';
 let currentDoctype     = null;
+let currentDocs        = [];
+let viewerDoctypeName  = '';
 let viewer             = null;
+let docsRequestToken   = 0;
+let viewerLoadToken    = 0;
+
+const bootstrap = window.PATIENT_BOOTSTRAP || {};
+const initialRouteHn = String(bootstrap.initialRouteHn || '').trim();
+const initialQueryHn = String(bootstrap.initialQueryHn || '').trim();
+const initialDateFrom = String(bootstrap.initialDateFrom || '').trim();
+const initialDateTo = String(bootstrap.initialDateTo || '').trim();
 
 const hnInput               = document.getElementById('hnInput');
 const btnSearch             = document.getElementById('btnSearch');
@@ -29,6 +39,11 @@ const dateFilterToggle      = document.getElementById('dateFilterToggle');
 const dateFilterPicker      = document.getElementById('dateFilterPicker');
 const dateFrom              = document.getElementById('dateFrom');
 const dateTo                = document.getElementById('dateTo');
+const btnSidebarPages       = document.getElementById('btnSidebarPages');
+const btnSidebarFiles       = document.getElementById('btnSidebarFiles');
+const viewerProgressFill    = document.getElementById('viewerProgressFill');
+const viewerProgressText    = document.getElementById('viewerProgressText');
+const viewerFilePageText    = document.getElementById('viewerFilePageText');
 
 viewer = new PdfViewer({
   viewerBody,
@@ -40,17 +55,29 @@ viewer = new PdfViewer({
   btnZoomIn: document.getElementById('btnZoomIn'),
   btnZoomOut: document.getElementById('btnZoomOut'),
   btnSidebarToggle: document.getElementById('btnSidebarToggle'),
+  btnSidebarPages,
+  btnSidebarFiles,
   allowFit: true,
   defaultScale: '1.25',
+  maxCachedDocs: 3,
+  renderWindow: 8,
+  onPageChange: onViewerPageChange,
+  onFileDownload: onViewerFileDownload,
 });
 
 // ── DATE FILTER HELPERS ───────────────────────────────
 function getDateParams() {
+  const query = buildDateQuery();
+  if (!query) return '';
+  return '&' + query;
+}
+
+function buildDateQuery() {
   if (!dateFilterToggle?.checked) return '';
   const from = dateFrom?.value;
   const to   = dateTo?.value || from;
   if (!from) return '';
-  let q = `&date_from=${encodeURIComponent(from)}`;
+  let q = `date_from=${encodeURIComponent(from)}`;
   if (to && to !== from) q += `&date_to=${encodeURIComponent(to)}`;
   return q;
 }
@@ -70,6 +97,75 @@ function fmtDate(d) {
   return `${dd}/${m}/${parseInt(y) + 543}`;
 }
 
+function updateCanonicalUrl(hn = '') {
+  const basePath = `${BASE_URL}/patient`;
+  const path = hn ? `${basePath}/${encodeURIComponent(hn)}` : basePath;
+  const query = buildDateQuery();
+  const nextUrl = query ? `${path}?${query}` : path;
+  window.history.replaceState(null, '', nextUrl);
+}
+
+function resetViewerProgress() {
+  if (viewerProgressFill) viewerProgressFill.style.width = '0%';
+  if (viewerProgressText) viewerProgressText.textContent = '0%';
+  if (viewerFilePageText) viewerFilePageText.textContent = 'ไฟล์ —/— · หน้า —/—';
+}
+
+function markDocCardSelected(docId) {
+  docCardsGrid?.querySelectorAll('.doc-file-card').forEach(card => {
+    card.classList.toggle('selected', card.dataset.docId === String(docId));
+  });
+}
+
+function onViewerPageChange(info) {
+  if (!info) return;
+
+  const pct = info.totalPages ? Math.min(100, Math.max(0, Math.round((info.globalPage / info.totalPages) * 100))) : 0;
+  if (viewerProgressFill) viewerProgressFill.style.width = `${pct}%`;
+  if (viewerProgressText) viewerProgressText.textContent = `${pct}%`;
+  if (viewerFilePageText) {
+    viewerFilePageText.textContent = `ไฟล์ ${info.fileIndex}/${info.fileCount} · หน้า ${info.pageInFile}/${info.filePages}`;
+  }
+
+  pdfViewerTitle.textContent = info.fileName || 'เอกสาร';
+  const sizeText = info.fileSize ? fmtSize(info.fileSize) : '—';
+  pdfViewerMeta.textContent = `หมวด: ${viewerDoctypeName || 'เอกสาร'} · ไฟล์ ${info.fileIndex}/${info.fileCount} · ${sizeText}`;
+
+  const docId = info.rawDoc?.id;
+  if (docId !== undefined && docId !== null) {
+    markDocCardSelected(docId);
+  }
+}
+
+function onViewerFileDownload(rawDoc) {
+  const docId = rawDoc?.id;
+  if (!docId) return;
+  const a = document.createElement('a');
+  a.href = BASE_URL + `/api/download?id=${encodeURIComponent(docId)}`;
+  a.download = rawDoc.original_name || 'document.pdf';
+  a.click();
+}
+
+function applyBootstrapState() {
+  if (initialDateFrom) {
+    if (dateFilterToggle) dateFilterToggle.checked = true;
+    if (dateFilterPicker) dateFilterPicker.style.display = '';
+    if (dateFrom) dateFrom.value = initialDateFrom;
+    if (dateTo) dateTo.value = initialDateTo || initialDateFrom;
+  } else {
+    if (dateFilterToggle) dateFilterToggle.checked = false;
+    if (dateFilterPicker) dateFilterPicker.style.display = 'none';
+  }
+
+  const bootstrapHn = initialRouteHn || initialQueryHn;
+  if (bootstrapHn) {
+    hnInput.value = bootstrapHn;
+    searchPatient({ hnOverride: bootstrapHn, auto: true });
+  } else {
+    hnInput.focus();
+  }
+}
+
 // ── DATE FILTER TOGGLE ────────────────────────────────
 dateFilterToggle?.addEventListener('change', () => {
   dateFilterPicker.style.display = dateFilterToggle.checked ? '' : 'none';
@@ -77,20 +173,40 @@ dateFilterToggle?.addEventListener('change', () => {
     dateFrom.value = '';
     dateTo.value   = '';
   }
+  updateCanonicalUrl(currentHN);
   if (currentHN) {
     loadSidebarCategories(currentHN);
-    resetDocCards();
+    if (currentDoctype) {
+      selectCategory(currentDoctype);
+    } else {
+      resetDocCards();
+    }
   }
 });
 
-dateFrom?.addEventListener('change', () => { if (currentHN) { loadSidebarCategories(currentHN); resetDocCards(); } });
-dateTo?.addEventListener('change',   () => { if (currentHN) { loadSidebarCategories(currentHN); resetDocCards(); } });
+dateFrom?.addEventListener('change', () => {
+  updateCanonicalUrl(currentHN);
+  if (currentHN) {
+    loadSidebarCategories(currentHN);
+    if (currentDoctype) selectCategory(currentDoctype);
+    else resetDocCards();
+  }
+});
+dateTo?.addEventListener('change', () => {
+  updateCanonicalUrl(currentHN);
+  if (currentHN) {
+    loadSidebarCategories(currentHN);
+    if (currentDoctype) selectCategory(currentDoctype);
+    else resetDocCards();
+  }
+});
 
 // ── SEARCH PATIENT ────────────────────────────────────
-async function searchPatient() {
-  const hn = hnInput.value.trim();
+async function searchPatient(opts = {}) {
+  const hn = (opts.hnOverride || hnInput.value || '').trim();
   if (!hn) { hnInput.focus(); return; }
   resetPatientUI();
+  hnInput.value = hn;
   btnSearch.disabled = true;
   btnSearch.innerHTML = '<div class="toast-spinner" style="border-color:#fff3;border-top-color:#fff;margin:0"></div>';
   try {
@@ -102,9 +218,10 @@ async function searchPatient() {
     }
     currentHN = hn;
     showPatientInfo(data.patient);
+    updateCanonicalUrl(hn);
     btnClear.style.display = '';
     doctypeSection.style.display = '';
-    loadSidebarCategories(hn);
+    await loadSidebarCategories(hn);
   } catch(e) {
     Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:e.message, confirmButtonColor:'#e05c5c' });
   } finally {
@@ -142,9 +259,13 @@ async function loadSidebarCategories(hn) {
           <i class="bi bi-folder2-open"></i>
           ${dateLabel ? 'ไม่พบเอกสาร' + dateLabel : 'ยังไม่มีเอกสาร'}
         </span></li>`;
+      currentDoctype = null;
+      currentDocs = [];
+      pdfViewerWrap.style.display = 'none';
+      resetViewerProgress();
       return;
     }
-    types.forEach((t, idx) => {
+    types.forEach(t => {
       const li = document.createElement('li');
       const isActive = currentDoctype && currentDoctype.doctype_id === t.doctype_id;
       li.innerHTML = `
@@ -158,24 +279,27 @@ async function loadSidebarCategories(hn) {
     });
   } catch(e) {
     sidebarCatMenu.innerHTML = `<li><span class="sidebar-cat-empty" style="color:var(--danger)">${esc(e.message)}</span></li>`;
+    currentDoctype = null;
+    currentDocs = [];
+    pdfViewerWrap.style.display = 'none';
+    resetViewerProgress();
   }
 }
 
 // ── SELECT CATEGORY ───────────────────────────────────
-function selectCategory(doctype) {
+async function selectCategory(doctype) {
   currentDoctype = doctype;
   // Highlight active in sidebar
   sidebarCatMenu.querySelectorAll('.sidebar-cat-item').forEach(a => {
     a.classList.toggle('active', a.dataset.id === String(doctype.doctype_id));
   });
-  // Hide viewer, show cards
-  pdfViewerWrap.style.display = 'none';
-  loadDocCards(doctype);
+  await loadDocCards(doctype);
   doctypeSection.scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
 // ── LOAD DOCUMENT CARDS ───────────────────────────────
 async function loadDocCards(doctype) {
+  const reqToken = ++docsRequestToken;
   docCardsCategoryName.textContent = doctype.DocTypeName;
   docCardsSubtitle.textContent     = '';
   docCardsGrid.innerHTML = `
@@ -186,11 +310,16 @@ async function loadDocCards(doctype) {
     const url  = BASE_URL + `/api/patient/docs?hn=${encodeURIComponent(currentHN)}&doctype_id=${encodeURIComponent(doctype.doctype_id)}${getDateParams()}`;
     const res  = await fetch(url);
     const data = await res.json();
+    if (reqToken !== docsRequestToken) return;
     if (data.error) throw new Error(data.error);
     const docs = data.docs || [];
+    currentDocs = docs;
     docCardsSubtitle.textContent = `(${docs.length} เอกสาร${getDateLabel()})`;
     docCardsGrid.innerHTML = '';
     if (!docs.length) {
+      pdfViewerWrap.style.display = 'none';
+      resetViewerProgress();
+      btnDownloadPdf.style.display = 'none';
       docCardsGrid.innerHTML = `
         <div class="doc-cards-placeholder">
           <i class="bi bi-file-earmark-x" style="font-size:36px;display:block;margin-bottom:12px;color:var(--border-strong)"></i>
@@ -201,6 +330,7 @@ async function loadDocCards(doctype) {
     docs.forEach((doc, idx) => {
       const card = document.createElement('div');
       card.className = 'doc-file-card';
+      card.dataset.docId = String(doc.id ?? idx);
       card.style.animationDelay = (idx * 0.04) + 's';
       const uploadedAt = doc.uploaded_at ? fmtDateTime(doc.uploaded_at) : '—';
       card.innerHTML = `
@@ -213,10 +343,34 @@ async function loadDocCards(doctype) {
           </div>
         </div>
         <div class="doc-file-action"><i class="bi bi-eye-fill"></i></div>`;
-      card.addEventListener('click', () => openDocPdf(doc, card, doctype));
+      card.addEventListener('click', () => {
+        markDocCardSelected(doc.id ?? idx);
+        if (
+          currentDoctype &&
+          String(currentDoctype.doctype_id) === String(doctype.doctype_id) &&
+          currentDocs.length &&
+          pdfViewerWrap.style.display !== 'none'
+        ) {
+          const jumpIndex = currentDocs.findIndex(d => String(d.id) === String(doc.id));
+          if (jumpIndex >= 0) {
+            viewer.scrollToFile(jumpIndex);
+            return;
+          }
+        }
+        openDoctypeViewer(doctype, docs, doc.id);
+      });
       docCardsGrid.appendChild(card);
     });
+
+    if (reqToken !== docsRequestToken) return;
+    await openDoctypeViewer(doctype, docs, docs[0]?.id);
+
   } catch(e) {
+    if (reqToken !== docsRequestToken) return;
+    currentDocs = [];
+    pdfViewerWrap.style.display = 'none';
+    btnDownloadPdf.style.display = 'none';
+    resetViewerProgress();
     docCardsGrid.innerHTML = `<div style="grid-column:1/-1;color:var(--danger);padding:20px">เกิดข้อผิดพลาด: ${esc(e.message)}</div>`;
   }
 }
@@ -233,42 +387,53 @@ function fmtDateTime(dt) {
   return `${day}/${mon}/${year} ${h}:${mi}`;
 }
 
-// ── OPEN PDF FROM DOCUMENT CARD ───────────────────────
-async function openDocPdf(doc, cardEl, doctype) {
-  // Highlight selected card
-  docCardsGrid.querySelectorAll('.doc-file-card').forEach(c => c.classList.remove('selected'));
-  cardEl.classList.add('selected');
+// ── OPEN DOCTYPE MULTI-PDF VIEWER ─────────────────────
+async function openDoctypeViewer(doctype, docs, startDocId = null) {
+  if (!Array.isArray(docs) || !docs.length) return;
 
-  // Show viewer with loading state
+  const openToken = ++viewerLoadToken;
+  currentDoctype = doctype;
+  currentDocs = docs;
+  viewerDoctypeName = doctype.DocTypeName || 'เอกสาร';
+
+  const startIndex = Math.max(0, docs.findIndex(d => String(d.id) === String(startDocId)));
+
+  resetViewerProgress();
   pdfViewerWrap.style.display = '';
-  pdfViewerTitle.textContent  = doc.original_name;
-  pdfViewerMeta.textContent   = `หมวด: ${doctype.DocTypeName} · กำลังโหลด...`;
+  pdfViewerTitle.textContent  = viewerDoctypeName;
+  pdfViewerMeta.textContent   = `หมวด: ${viewerDoctypeName} · ${docs.length} ไฟล์${getDateLabel()}`;
   btnDownloadPdf.style.display = 'none';
-  viewerBody.innerHTML = `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:12px;color:var(--text-muted)">
-      <div class="spin-ring" style="border-top-color:var(--primary);border-color:#e0e0e0;width:36px;height:36px;border-width:3px"></div>
-      <p style="margin:0;font-size:14px">กำลังโหลดเอกสาร...</p>
-    </div>`;
+  btnDownloadPdf.onclick = null;
 
-  // Scroll to viewer
   setTimeout(() => pdfViewerWrap.scrollIntoView({ behavior:'smooth', block:'start' }), 80);
 
   try {
-    pdfViewerMeta.textContent = `หมวด: ${doctype.DocTypeName} · ${fmtSize(doc.file_size)}`;
+    const sequenceDocs = docs.map((doc, idx) => ({
+      ...doc,
+      idx,
+      url: BASE_URL + `/api/download?id=${encodeURIComponent(doc.id)}&inline=1`,
+      download_url: BASE_URL + `/api/download?id=${encodeURIComponent(doc.id)}`,
+    }));
 
-    // Setup download button
+    await viewer.loadSequence(sequenceDocs);
+
+    if (openToken !== viewerLoadToken) {
+      return;
+    }
+
     btnDownloadPdf.style.display = '';
     btnDownloadPdf.onclick = () => {
-      const a = document.createElement('a');
-      a.href = BASE_URL + `/api/download?id=${encodeURIComponent(doc.id)}`;
-      a.download = doc.original_name;
-      a.click();
+      viewer.downloadCurrentFile();
     };
 
-    // Load PDF
-    await viewer.load(BASE_URL + `/api/download?id=${encodeURIComponent(doc.id)}&inline=1`);
+    if (startIndex > 0) {
+      viewer.scrollToFile(startIndex);
+    }
 
   } catch(e) {
+    if (openToken !== viewerLoadToken) return;
+    btnDownloadPdf.style.display = 'none';
+    resetViewerProgress();
     viewerBody.innerHTML = `
       <div style="color:var(--danger);padding:32px;text-align:center">
         <i class="bi bi-exclamation-triangle" style="font-size:32px;display:block;margin-bottom:8px"></i>
@@ -279,8 +444,13 @@ async function openDocPdf(doc, cardEl, doctype) {
 
 // ── RESET HELPERS ─────────────────────────────────────
 function resetDocCards() {
+  viewerLoadToken += 1;
+  currentDocs = [];
   currentDoctype = null;
+  viewerDoctypeName = '';
   pdfViewerWrap.style.display = 'none';
+  btnDownloadPdf.style.display = 'none';
+  resetViewerProgress();
   docCardsCategoryName.textContent = 'เลือกหมวดเอกสารจากแถบด้านซ้าย';
   docCardsSubtitle.textContent     = '';
   docCardsGrid.innerHTML = `
@@ -291,7 +461,10 @@ function resetDocCards() {
 }
 
 function resetPatientUI() {
+  viewerLoadToken += 1;
   currentHN = '';
+  currentDocs = [];
+  viewerDoctypeName = '';
   currentDoctype = null;
   patientInfoBar.classList.remove('show');
   doctypeSection.style.display = 'none';
@@ -305,6 +478,7 @@ function clearAll() {
   hnInput.value = '';
   btnClear.style.display = 'none';
   resetPatientUI();
+  updateCanonicalUrl('');
   hnInput.focus();
 }
 
@@ -314,7 +488,10 @@ hnInput.addEventListener('keydown', e => { if(e.key==='Enter') searchPatient(); 
 btnClear.addEventListener('click', clearAll);
 btnBackDoctype?.addEventListener('click', () => {
   pdfViewerWrap.style.display = 'none';
+  btnDownloadPdf.style.display = 'none';
   docCardsGrid.querySelectorAll('.doc-file-card').forEach(c => c.classList.remove('selected'));
   document.getElementById('docCardsSection')?.scrollIntoView({ behavior:'smooth', block:'start' });
 });
-hnInput.focus();
+
+applyBootstrapState();
+

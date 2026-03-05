@@ -11,12 +11,29 @@ class PatientController extends Controller
     /**
      * Render patient search page
      */
-    public function index(): void
+    public function index(string $routeHn = ''): void
     {
         $pageTitle  = 'ค้นหาผู้ป่วย';
         $breadcrumb = 'ค้นหาผู้ป่วย';
         $activePage = 'patient';
-        $this->view('patient/index', compact('pageTitle', 'breadcrumb', 'activePage'));
+
+        $initialRouteHn = trim($routeHn);
+        $initialQueryHn = $this->query('hn');
+        $initialDateFrom = $this->query('date_from');
+        $initialDateTo = $this->query('date_to');
+
+        $this->view(
+            'patient/index',
+            compact(
+                'pageTitle',
+                'breadcrumb',
+                'activePage',
+                'initialRouteHn',
+                'initialQueryHn',
+                'initialDateFrom',
+                'initialDateTo'
+            )
+        );
     }
 
     /**

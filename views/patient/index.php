@@ -1,5 +1,10 @@
 <?php
 require BASE_PATH . '/views/layouts/head.php';
+
+$initialRouteHn = $initialRouteHn ?? '';
+$initialQueryHn = $initialQueryHn ?? '';
+$initialDateFrom = $initialDateFrom ?? '';
+$initialDateTo = $initialDateTo ?? '';
 ?>
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/styles.css">
 </head>
@@ -85,11 +90,20 @@ require BASE_PATH . '/views/layouts/head.php';
 
           <!-- Viewer Header -->
           <div class="doc-list-header">
-            <div>
+            <div class="doc-list-header-main">
               <div class="doc-list-title" id="pdfViewerTitle">เอกสาร</div>
               <div class="doc-list-sub" id="pdfViewerMeta"></div>
+              <div class="patient-viewer-progress" id="patientViewerProgress">
+                <div class="patient-progress-track">
+                  <span class="patient-progress-fill" id="viewerProgressFill"></span>
+                </div>
+                <div class="patient-progress-texts">
+                  <span id="viewerProgressText">0%</span>
+                  <span id="viewerFilePageText">ไฟล์ —/— · หน้า —/—</span>
+                </div>
+              </div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center">
+            <div class="doc-list-header-actions">
               <button class="btn btn-primary" id="btnDownloadPdf" style="display:none;font-size:13px;padding:8px 14px">
                 <i class="bi bi-download"></i> ดาวน์โหลด
               </button>
@@ -125,6 +139,10 @@ require BASE_PATH . '/views/layouts/head.php';
               </select>
               <button class="vt-btn" id="btnZoomIn" title="ขยาย"><i class="bi bi-plus-lg"></i></button>
             </div>
+            <div class="vt-group patient-vt-mode-group">
+              <button class="vt-mode-btn active" id="btnSidebarPages" type="button" title="ดูตามหน้า">Pages</button>
+              <button class="vt-mode-btn" id="btnSidebarFiles" type="button" title="ดูตามไฟล์">Files</button>
+            </div>
             <div class="vt-spacer"></div>
             <div class="vt-group">
               <button class="vt-btn" id="btnSidebarToggle" title="แถบตัวอย่างหน้า"><i class="bi bi-layout-sidebar"></i></button>
@@ -142,6 +160,14 @@ require BASE_PATH . '/views/layouts/head.php';
   </div>
 </div>
 
-<script>const BASE_URL = '<?= BASE_URL ?>';</script>
+<script>
+const BASE_URL = '<?= BASE_URL ?>';
+window.PATIENT_BOOTSTRAP = <?= json_encode([
+  'initialRouteHn' => (string) $initialRouteHn,
+  'initialQueryHn' => (string) $initialQueryHn,
+  'initialDateFrom' => (string) $initialDateFrom,
+  'initialDateTo' => (string) $initialDateTo,
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+</script>
 <script src="<?= BASE_URL ?>/public/js/patient_page.js" type="module"></script>
 <?php require BASE_PATH . '/views/layouts/footer.php'; ?>
