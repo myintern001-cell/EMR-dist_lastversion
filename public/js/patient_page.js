@@ -44,6 +44,16 @@ const btnSidebarFiles       = document.getElementById('btnSidebarFiles');
 const viewerProgressFill    = document.getElementById('viewerProgressFill');
 const viewerProgressText    = document.getElementById('viewerProgressText');
 const viewerFilePageText    = document.getElementById('viewerFilePageText');
+const flowStep1             = document.getElementById('flowStep1');
+const flowStep2             = document.getElementById('flowStep2');
+const flowStep3             = document.getElementById('flowStep3');
+const flowArrow1            = document.getElementById('flowArrow1');
+const flowArrow2            = document.getElementById('flowArrow2');
+const filterPills           = document.getElementById('filterPills');
+const viewerFloatHud        = document.getElementById('viewerFloatHud');
+const hudRingFill           = document.getElementById('hudRingFill');
+const hudPageText           = document.getElementById('hudPageText');
+const hudFileText           = document.getElementById('hudFileText');
 
 viewer = new PdfViewer({
   viewerBody,
@@ -109,6 +119,76 @@ function resetViewerProgress() {
   if (viewerProgressFill) viewerProgressFill.style.width = '0%';
   if (viewerProgressText) viewerProgressText.textContent = '0%';
   if (viewerFilePageText) viewerFilePageText.textContent = 'ไฟล์ —/— · หน้า —/—';
+  updateHud(null);
+}
+
+// ── FLOW STEPPER ──────────────────────────────────────
+function setFlowStep(step) {
+  [flowStep1, flowStep2, flowStep3].forEach((el, i) => {
+    if (!el) return;
+    el.classList.remove('active', 'done');
+    if (i + 1 < step) el.classList.add('done');
+    else if (i + 1 === step) el.classList.add('active');
+  });
+  [flowArrow1, flowArrow2].forEach((el, i) => {
+    if (!el) return;
+    el.classList.toggle('done', i + 1 < step);
+  });
+}
+
+// ── FILTER PILLS ──────────────────────────────────────
+function updateFilterPills() {
+  if (!filterPills) return;
+  const pills = [];
+  if (currentHN) {
+    pills.push(`<span class="filter-pill"><i class="bi bi-person-badge"></i> HN: ${esc(currentHN)}</span>`);
+  }
+  if (dateFilterToggle?.checked && dateFrom?.value) {
+    const from = fmtDate(dateFrom.value);
+    const to = dateTo?.value ? fmtDate(dateTo.value) : from;
+    const label = (to && to !== from) ? `${from} — ${to}` : from;
+    pills.push(`<span class="filter-pill"><i class="bi bi-calendar3"></i> ${label}
+      <button class="filter-pill-close" id="pillRemoveDate" title="ลบตัวกรองวันที่"><i class="bi bi-x"></i></button>
+    </span>`);
+  }
+  if (pills.length) {
+    filterPills.innerHTML = pills.join('');
+    filterPills.style.display = '';
+    const removeBtn = document.getElementById('pillRemoveDate');
+    removeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (dateFilterToggle) dateFilterToggle.checked = false;
+      if (dateFilterPicker) dateFilterPicker.style.display = 'none';
+      if (dateFrom) dateFrom.value = '';
+      if (dateTo) dateTo.value = '';
+      updateCanonicalUrl(currentHN);
+      updateFilterPills();
+      if (currentHN) {
+        loadSidebarCategories(currentHN);
+        if (currentDoctype) selectCategory(currentDoctype);
+        else resetDocCards();
+      }
+    });
+  } else {
+    filterPills.style.display = 'none';
+    filterPills.innerHTML = '';
+  }
+}
+
+// ── FLOATING HUD ──────────────────────────────────────
+function updateHud(info) {
+  if (!viewerFloatHud) return;
+  if (!info || !info.totalPages) {
+    viewerFloatHud.classList.remove('visible');
+    return;
+  }
+  viewerFloatHud.classList.add('visible');
+  const pct = Math.min(100, Math.max(0, Math.round((info.globalPage / info.totalPages) * 100)));
+  const circumference = 97.4;
+  const offset = circumference - (pct / 100) * circumference;
+  if (hudRingFill) hudRingFill.setAttribute('stroke-dashoffset', String(offset));
+  if (hudPageText) hudPageText.textContent = `หน้า ${info.globalPage}/${info.totalPages}`;
+  if (hudFileText) hudFileText.textContent = `ไฟล์ ${info.fileIndex}/${info.fileCount}`;
 }
 
 function markDocCardSelected(docId) {
@@ -135,6 +215,8 @@ function onViewerPageChange(info) {
   if (docId !== undefined && docId !== null) {
     markDocCardSelected(docId);
   }
+
+  updateHud(info);
 }
 
 function onViewerFileDownload(rawDoc) {
@@ -174,6 +256,7 @@ dateFilterToggle?.addEventListener('change', () => {
     dateTo.value   = '';
   }
   updateCanonicalUrl(currentHN);
+  updateFilterPills();
   if (currentHN) {
     loadSidebarCategories(currentHN);
     if (currentDoctype) {
@@ -186,6 +269,7 @@ dateFilterToggle?.addEventListener('change', () => {
 
 dateFrom?.addEventListener('change', () => {
   updateCanonicalUrl(currentHN);
+  updateFilterPills();
   if (currentHN) {
     loadSidebarCategories(currentHN);
     if (currentDoctype) selectCategory(currentDoctype);
@@ -194,6 +278,7 @@ dateFrom?.addEventListener('change', () => {
 });
 dateTo?.addEventListener('change', () => {
   updateCanonicalUrl(currentHN);
+  updateFilterPills();
   if (currentHN) {
     loadSidebarCategories(currentHN);
     if (currentDoctype) selectCategory(currentDoctype);
@@ -221,6 +306,8 @@ async function searchPatient(opts = {}) {
     updateCanonicalUrl(hn);
     btnClear.style.display = '';
     doctypeSection.style.display = '';
+    setFlowStep(2);
+    updateFilterPills();
     await loadSidebarCategories(hn);
   } catch(e) {
     Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:e.message, confirmButtonColor:'#e05c5c' });
@@ -295,6 +382,7 @@ async function selectCategory(doctype) {
   });
   await loadDocCards(doctype);
   doctypeSection.scrollIntoView({ behavior:'smooth', block:'start' });
+  setFlowStep(currentDocs.length ? 3 : 2);
 }
 
 // ── LOAD DOCUMENT CARDS ───────────────────────────────
@@ -401,6 +489,7 @@ async function openDoctypeViewer(doctype, docs, startDocId = null) {
   resetViewerProgress();
   pdfViewerWrap.style.display = '';
   pdfViewerTitle.textContent  = viewerDoctypeName;
+  setFlowStep(3);
   pdfViewerMeta.textContent   = `หมวด: ${viewerDoctypeName} · ${docs.length} ไฟล์${getDateLabel()}`;
   btnDownloadPdf.style.display = 'none';
   btnDownloadPdf.onclick = null;
@@ -472,6 +561,8 @@ function resetPatientUI() {
   if (sidebarCatSection) sidebarCatSection.style.display = 'none';
   if (sidebarCatMenu)    sidebarCatMenu.innerHTML = '';
   resetDocCards();
+  setFlowStep(1);
+  updateFilterPills();
 }
 
 function clearAll() {

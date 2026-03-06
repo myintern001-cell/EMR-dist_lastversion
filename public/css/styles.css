@@ -2383,3 +2383,545 @@ transition: opacity .18s;
 .doc-file-card:hover .doc-file-action {
 opacity: 1;
 }
+
+/* ═══════════════════════════════════════
+   FLOW STEPPER (Patient page)
+═══════════════════════════════════════ */
+.flow-stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 24px;
+    padding: 0;
+}
+
+.flow-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all .25s ease;
+    position: relative;
+    white-space: nowrap;
+}
+
+.flow-step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: all .25s ease;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.flow-step.active {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.flow-step.active .flow-step-num {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.flow-step.done {
+    border-color: var(--primary-mid);
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.flow-step.done .flow-step-num {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.flow-step-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    color: var(--border-strong);
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.flow-step-arrow.done {
+    color: var(--primary);
+}
+
+/* ═══════════════════════════════════════
+   FILTER PILLS
+═══════════════════════════════════════ */
+.filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    animation: fadeSlideUp .2s ease both;
+}
+
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: var(--primary-soft);
+    border: 1.5px solid var(--primary-mid);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    animation: fadeSlideUp .18s ease both;
+}
+
+.filter-pill i {
+    font-size: 11px;
+}
+
+.filter-pill-close {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(29,209,189,.2);
+    color: var(--primary);
+    cursor: pointer;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+    padding: 0;
+    line-height: 1;
+}
+
+.filter-pill-close:hover {
+    background: var(--primary);
+    color: white;
+}
+
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════
+   FLOATING MINI HUD (Viewer)
+═══════════════════════════════════════ */
+.viewer-float-hud {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: rgba(0,0,0,.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.1);
+    color: rgba(255,255,255,.85);
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .25s, transform .25s;
+    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+}
+
+.viewer-float-hud.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.hud-progress-ring {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.hud-progress-ring circle {
+    fill: none;
+    stroke-width: 3;
+}
+
+.hud-ring-bg {
+    stroke: rgba(255,255,255,.15);
+}
+
+.hud-ring-fill {
+    stroke: var(--primary);
+    stroke-linecap: round;
+    transition: stroke-dashoffset .3s ease;
+    transform: rotate(-90deg);
+    transform-origin: center;
+}
+
+.hud-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hud-page-text {
+    font-size: 12px;
+    color: rgba(255,255,255,.9);
+    font-weight: 600;
+}
+
+.hud-file-text {
+    font-size: 10px;
+    color: rgba(255,255,255,.5);
+}
+
+/* ═══════════════════════════════════════
+   SECTION TRANSITIONS
+═══════════════════════════════════════ */
+.section-fade {
+    animation: fadeSlideUp .3s ease both;
+}
+
+.doc-cards-grid .doc-file-card {
+    animation: fadeSlideUp .25s ease both;
+}
+
+/* ═══════════════════════════════════════
+   UPLOAD STEPPER
+═══════════════════════════════════════ */
+.upload-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 28px;
+    padding: 20px 28px;
+    background: var(--card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+
+.upload-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all .25s ease;
+    white-space: nowrap;
+}
+
+.upload-step-num {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: all .25s ease;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.upload-step.active {
+    color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.upload-step.active .upload-step-num {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.upload-step.done {
+    color: var(--success);
+}
+
+.upload-step.done .upload-step-num {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+}
+
+.upload-step-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    color: var(--border-strong);
+    font-size: 14px;
+}
+
+.upload-step-arrow.done {
+    color: var(--success);
+}
+
+/* ═══════════════════════════════════════
+   UPLOAD SUMMARY BAR
+═══════════════════════════════════════ */
+.upload-summary-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 24px;
+    margin: 0 28px 20px;
+    background: linear-gradient(135deg, #f0faf9, #e4f8f6);
+    border: 1.5px solid var(--primary-mid);
+    border-radius: 14px;
+    animation: fadeSlideUp .25s ease both;
+}
+
+.upload-summary-bar.show {
+    display: flex;
+}
+
+.upload-summary-items {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.upload-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-sub);
+}
+
+.upload-summary-item i {
+    color: var(--primary);
+    font-size: 15px;
+}
+
+.upload-summary-item strong {
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* ═══════════════════════════════════════
+   VALIDATION CHIPS
+═══════════════════════════════════════ */
+.validation-chip {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    animation: fadeSlideUp .15s ease both;
+}
+
+.validation-chip.show {
+    display: inline-flex;
+}
+
+.validation-chip.error {
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+.validation-chip.success {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.validation-chip i {
+    font-size: 12px;
+}
+
+/* ═══════════════════════════════════════
+   UPLOAD PROGRESS BAR
+═══════════════════════════════════════ */
+.upload-progress-wrap {
+    display: none;
+    margin: 0 28px 20px;
+    padding: 16px 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    animation: fadeSlideUp .2s ease both;
+}
+
+.upload-progress-wrap.show {
+    display: block;
+}
+
+.upload-progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-sub);
+}
+
+.upload-progress-pct {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.upload-progress-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--bg);
+    overflow: hidden;
+}
+
+.upload-progress-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--primary), #59e4d4);
+    border-radius: 999px;
+    transition: width .3s ease;
+}
+
+/* ═══════════════════════════════════════
+   POST-UPLOAD ACTIONS
+═══════════════════════════════════════ */
+.post-upload-actions {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 40px 28px;
+    animation: fadeSlideUp .3s ease both;
+}
+
+.post-upload-actions.show {
+    display: flex;
+}
+
+.post-upload-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--success-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: var(--success);
+    animation: successPop .4s ease both;
+}
+
+@keyframes successPop {
+    0%   { transform: scale(0); opacity: 0; }
+    60%  { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.post-upload-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.post-upload-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-align: center;
+    max-width: 360px;
+}
+
+.post-upload-btns {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+/* ═══════════════════════════════════════
+   VIEWER BODY RELATIVE (for HUD)
+═══════════════════════════════════════ */
+.patient-viewer-body {
+    position: relative;
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media (max-width: 768px) {
+    .flow-stepper {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .flow-step {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .flow-step-arrow {
+        display: none;
+    }
+
+    .upload-stepper {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 14px;
+    }
+
+    .upload-step {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .upload-step-arrow {
+        display: none;
+    }
+
+    .viewer-float-hud {
+        bottom: 12px;
+        right: 12px;
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    .upload-summary-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

@@ -22,6 +22,21 @@ $initialDateTo = $initialDateTo ?? '';
       </div>
     </div>
 
+    <!-- Flow Stepper -->
+    <div class="flow-stepper" id="flowStepper">
+      <div class="flow-step active" id="flowStep1">
+        <span class="flow-step-num">1</span> ค้นหาผู้ป่วย
+      </div>
+      <span class="flow-step-arrow" id="flowArrow1"><i class="bi bi-chevron-right"></i></span>
+      <div class="flow-step" id="flowStep2">
+        <span class="flow-step-num">2</span> เลือกหมวดเอกสาร
+      </div>
+      <span class="flow-step-arrow" id="flowArrow2"><i class="bi bi-chevron-right"></i></span>
+      <div class="flow-step" id="flowStep3">
+        <span class="flow-step-num">3</span> ดูเอกสาร
+      </div>
+    </div>
+
     <!-- HN Search Card -->
     <div class="hn-search-card">
       <div class="hn-search-title"><i class="bi bi-search" style="color:var(--primary)"></i> ค้นหาผู้ป่วยด้วย HN</div>
@@ -62,6 +77,9 @@ $initialDateTo = $initialDateTo ?? '';
           </div>
         </div>
       </div>
+
+      <!-- Active Filter Pills -->
+      <div class="filter-pills" id="filterPills" style="display:none"></div>
     </div>
 
     <!-- Document Section (hidden until patient found) -->
@@ -150,7 +168,20 @@ $initialDateTo = $initialDateTo ?? '';
           </div>
 
           <!-- Viewer Body -->
-          <div class="viewer-body patient-viewer-body" id="viewerBody"></div>
+          <div class="viewer-body patient-viewer-body" id="viewerBody">
+            <!-- Floating Mini HUD -->
+            <div class="viewer-float-hud" id="viewerFloatHud">
+              <svg class="hud-progress-ring" viewBox="0 0 36 36">
+                <circle class="hud-ring-bg" cx="18" cy="18" r="15.5"></circle>
+                <circle class="hud-ring-fill" id="hudRingFill" cx="18" cy="18" r="15.5"
+                  stroke-dasharray="97.4" stroke-dashoffset="97.4"></circle>
+              </svg>
+              <div class="hud-info">
+                <span class="hud-page-text" id="hudPageText">หน้า —/—</span>
+                <span class="hud-file-text" id="hudFileText">ไฟล์ —/—</span>
+              </div>
+            </div>
+          </div>
 
         </div>
       </div>

@@ -23,6 +23,25 @@ require BASE_PATH . '/views/layouts/head.php';
       </div>
     </div>
 
+    <!-- Upload Stepper -->
+    <div class="upload-stepper" id="uploadStepper">
+      <div class="upload-step active" id="upStep1">
+        <span class="upload-step-num">1</span> กรอกข้อมูล
+      </div>
+      <span class="upload-step-arrow" id="upArrow1"><i class="bi bi-chevron-right"></i></span>
+      <div class="upload-step" id="upStep2">
+        <span class="upload-step-num">2</span> เลือกไฟล์
+      </div>
+      <span class="upload-step-arrow" id="upArrow2"><i class="bi bi-chevron-right"></i></span>
+      <div class="upload-step" id="upStep3">
+        <span class="upload-step-num">3</span> ตรวจสอบ
+      </div>
+      <span class="upload-step-arrow" id="upArrow3"><i class="bi bi-chevron-right"></i></span>
+      <div class="upload-step" id="upStep4">
+        <span class="upload-step-num">4</span> อัปโหลด
+      </div>
+    </div>
+
     <!-- Main Card -->
     <div class="card">
 
@@ -39,6 +58,7 @@ require BASE_PATH . '/views/layouts/head.php';
               HN (Hospital Number)
             </label>
             <input type="text" id="hnUploadInput" class="form-input" placeholder="กรอก HN เช่น 123456" maxlength="20" autocomplete="off">
+            <div class="validation-chip" id="hnValidation"></div>
           </div>
           <div class="form-group">
             <label class="form-label">
@@ -48,6 +68,7 @@ require BASE_PATH . '/views/layouts/head.php';
             <select id="doctypeUploadInput" class="form-input doctype-select2" style="width:100%">
               <option value="">เลือกหมวดเอกสาร...</option>
             </select>
+            <div class="validation-chip" id="doctypeValidation"></div>
           </div>
         </div>
       </div>
@@ -60,6 +81,27 @@ require BASE_PATH . '/views/layouts/head.php';
           <div class="dz-title" id="dzTitle">วางไฟล์ PDF ที่นี่ หรือคลิกเพื่อเลือกไฟล์</div>
           <div class="dz-sub">รองรับไฟล์ PDF สูงสุด <b>100 MB</b> ต่อไฟล์</div>
           <div class="dz-formats"><span class="dz-format-tag">PDF</span></div>
+        </div>
+      </div>
+
+      <!-- Upload Summary Bar -->
+      <div class="upload-summary-bar" id="uploadSummaryBar">
+        <div class="upload-summary-items">
+          <div class="upload-summary-item"><i class="bi bi-person-badge"></i> HN: <strong id="summaryHn">—</strong></div>
+          <div class="upload-summary-item"><i class="bi bi-folder2"></i> หมวด: <strong id="summaryDoctype">—</strong></div>
+          <div class="upload-summary-item"><i class="bi bi-file-earmark-pdf"></i> ไฟล์: <strong id="summaryFile">—</strong></div>
+          <div class="upload-summary-item"><i class="bi bi-hdd"></i> ขนาด: <strong id="summarySize">—</strong></div>
+        </div>
+      </div>
+
+      <!-- Upload Progress -->
+      <div class="upload-progress-wrap" id="uploadProgressWrap">
+        <div class="upload-progress-header">
+          <span>กำลังอัปโหลด...</span>
+          <span class="upload-progress-pct" id="uploadProgressPct">0%</span>
+        </div>
+        <div class="upload-progress-track">
+          <span class="upload-progress-fill" id="uploadProgressFill"></span>
         </div>
       </div>
 
@@ -115,6 +157,21 @@ require BASE_PATH . '/views/layouts/head.php';
           </div>
         </div>
         <div class="viewer-body" id="viewerBody"></div>
+      </div>
+
+      <!-- Post-Upload Actions -->
+      <div class="post-upload-actions" id="postUploadActions">
+        <div class="post-upload-icon"><i class="bi bi-check-lg"></i></div>
+        <div class="post-upload-title" id="postUploadTitle">อัปโหลดสำเร็จ!</div>
+        <div class="post-upload-sub" id="postUploadSub">เอกสารถูกบันทึกเข้าระบบเรียบร้อยแล้ว</div>
+        <div class="post-upload-btns">
+          <a class="btn btn-primary" id="postBtnViewPatient" href="#">
+            <i class="bi bi-person-lines-fill"></i> ดูเอกสารผู้ป่วย
+          </a>
+          <button class="btn btn-ghost" id="postBtnUploadMore">
+            <i class="bi bi-cloud-arrow-up"></i> อัปโหลดไฟล์ใหม่
+          </button>
+        </div>
       </div>
 
     </div><!-- /card -->
